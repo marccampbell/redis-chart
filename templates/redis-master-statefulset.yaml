@@ -27,7 +27,6 @@ spec:
       annotations:
         checksum/health: {{ include (print $.Template.BasePath "/health-configmap.yaml") . | sha256sum }}
         checksum/configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
-        checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
       {{- if .Values.master.podAnnotations }}
 {{ toYaml .Values.master.podAnnotations | indent 8 }}
       {{- end }}
@@ -40,6 +39,9 @@ spec:
       {{- end}}
       {{- if .Values.master.securityContext.enabled }}
       securityContext:
+        sysctls:
+          - name: net.core.somaxconn
+            value: "10000"
         fsGroup: {{ .Values.master.securityContext.fsGroup }}
         runAsUser: {{ .Values.master.securityContext.runAsUser }}
       {{- end }}
